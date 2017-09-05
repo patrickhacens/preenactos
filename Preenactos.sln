@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Preenactos", "src\Preenactos.csproj", "{F4DB59FE-D5A5-4CDA-A237-DAB82C3296AD}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker\docker-compose.dcproj", "{D81FB157-ABAF-4CBB-BD54-B9BFAC2E8365}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4DB59FE-D5A5-4CDA-A237-DAB82C3296AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4DB59FE-D5A5-4CDA-A237-DAB82C3296AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4DB59FE-D5A5-4CDA-A237-DAB82C3296AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4DB59FE-D5A5-4CDA-A237-DAB82C3296AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D81FB157-ABAF-4CBB-BD54-B9BFAC2E8365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D81FB157-ABAF-4CBB-BD54-B9BFAC2E8365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D81FB157-ABAF-4CBB-BD54-B9BFAC2E8365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D81FB157-ABAF-4CBB-BD54-B9BFAC2E8365}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4DC7C34B-8B08-4864-AA53-FFA8F96C2FDC}
+	EndGlobalSection
+EndGlobal
