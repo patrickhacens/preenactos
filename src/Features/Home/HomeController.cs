@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Preenactos.Infraestructure;
 
 namespace Preenactos.Home
 {
@@ -11,5 +12,10 @@ namespace Preenactos.Home
     {
         [HttpGet]
         public string Get() => "Hello Preenactos";
+
+        [HttpGet]
+        [JWTAuth]
+        [Route("Auth")]
+        public string Auth() => "You are authorized";
     }
 }
