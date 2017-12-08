@@ -20,5 +20,12 @@ namespace Preenactos.Domain
             using (EncryptService service = new EncryptService())
                 (this.PasswordHash, this.PasswordSalt) = service.Encrypt(password);
         }
+
+        public bool IsPasswordEqualsTo(string password)
+        {
+            using (EncryptService service = new EncryptService())
+                return service.Encrypt(password, this.PasswordSalt) == this.PasswordHash;
+
+        }
     }
 }
