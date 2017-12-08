@@ -83,6 +83,7 @@ namespace Preenactos
             Mapper.AssertConfigurationIsValid();
 
             services.AddMediatR(typeof(Startup));
+
             return services.BuildServiceProvider();
         }
 
@@ -93,6 +94,8 @@ namespace Preenactos
 
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
+
+            app.UseDatabaseErrorPage();
 
             app.UseMiddleware<ExceptionHandlerMiddleware>();
 

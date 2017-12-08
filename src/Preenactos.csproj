@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <Folder Include="Domain\" />
-    <Folder Include="Features\Authentication\Login\" />
     <Folder Include="Features\Authentication\Logout\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
