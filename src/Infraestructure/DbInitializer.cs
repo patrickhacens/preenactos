@@ -12,6 +12,15 @@ namespace Preenactos.Infraestructure
         public static async Task Initialize(Db db, ILogger logger)
         {
 
+            var admin = new Domain.User()
+            {
+                Email = "admin@admin.com",
+                Name = "administrator",
+                UserName = "admin"
+            };
+            admin.SetPassword("Asdf1234");
+            db.Users.Add(admin);
+            await db.SaveChangesAsync();
         }
     }
 }
