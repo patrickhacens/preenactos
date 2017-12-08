@@ -1,61 +1,104 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Preenactos.Infraestructure;
+using Preenactos.Domain;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Preenactos
 {
-    public class Startup
+    public class Startup : IStartup
     {
-        public Startup(IConfiguration configuration)
+        public Action<DbContextOptionsBuilder> DatabaseConfigurationAction { get; set; }
+
+        public Startup(IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", false, true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
+                .AddEnvironmentVariables();
+
+            Configuration = builder.Build();
+
+            DatabaseConfigurationAction = GetDatabaseConfiguration();
         }
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        IServiceProvider IStartup.ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
+            services.AddMvc(opt =>
+            {
+                opt.Filters.Add(typeof(ValidationActionFilter));
+            })
                     .AddFeatureFolders()
-                    .AddFluentValidation(conf => conf.RegisterValidatorsFromAssemblyContaining<Startup>())
+                    .AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<Startup>())
                     .AddJsonOptions(options =>
                     {
                         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                     });
 
-            services.AddDbContextPool<Db>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<Db>(DatabaseConfigurationAction)
+                    .AddAutoMapper(typeof(Startup));
 
-            services.AddAutoMapper(typeof(Startup));
+            services.AddIdentityCore<User>(options =>
+            {
+                options.Password = new PasswordOptions() { RequiredLength = 8 };
+                options.User = new UserOptions() { RequireUniqueEmail = true };
+            })
+                .AddRoles<Role>()
+                .AddEntityFrameworkStores<Db>()
+                .AddDefaultTokenProviders();
+
+            services.AddAuthentication()
+                .AddJwtBearer(o =>
+                {
+                    o.RequireHttpsMetadata = false;
+                    o.SaveToken = true;
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Tokens:Key"])),
+                        ValidateAudience = true,
+                        ValidAudience = Configuration["Tokens:Audience"],
+
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration["Tokens:Issuer"],
+
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
 
             Mapper.AssertConfigurationIsValid();
 
             services.AddMediatR(typeof(Startup));
+            return services.BuildServiceProvider();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
+            var env = app.ApplicationServices.GetService<IHostingEnvironment>();
+            var loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
+
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
 
             app.UseMiddleware<ExceptionHandlerMiddleware>();
 
             app.UseMvcWithDefaultRoute();
         }
+
+        public Action<DbContextOptionsBuilder> GetDatabaseConfiguration() => options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
     }
 }
